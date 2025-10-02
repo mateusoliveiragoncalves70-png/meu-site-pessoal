@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minhas Finanças Pro</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 Controle Financeiro Pro</h1>
+            <p>Gerencie suas finanças de forma inteligente e eficiente</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <h3>💳 Saldo Atual</h3>
+                <div class="amount balance" id="balance">R$ 0,00</div>
+                <div class="trend" id="balanceTrend">Calculando...</div>
+            </div>
+            <div class="stat-card">
+                <h3>📈 Receitas Totais</h3>
+                <div class="amount income" id="income">R$ 0,00</div>
+                <div class="trend" id="incomeTrend">Este mês</div>
+            </div>
+            <div class="stat-card">
+                <h3>📉 Gastos Totais</h3>
+                <div class="amount expense" id="expenses">R$ 0,00</div>
+                <div class="trend" id="expensesTrend">Este mês</div>
+            </div>
+            <div class="stat-card">
+                <h3>📊 Meta Mensal</h3>
+                <div class="amount" id="monthlyGoal" style="color: #8b5cf6;">R$ 0,00</div>
+                <div class="trend" id="goalProgress">Definir meta</div>
+                <div class="progress-bar-container">
+                    <div id="goalProgressBar" class="progress-bar"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="charts-section">
+            <h2>📈 Seus Gráficos Financeiros</h2>
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <p class="chart-title">Receitas vs. Despesas</p>
+                    <canvas id="balanceChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <p class="chart-title">Gastos por Categoria</p>
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="panel">
+                <h2>➕ Nova Transação</h2>
+                <form id="transactionForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="description">Descrição</label>
+                            <input type="text" id="description" placeholder="Ex: Salário, Supermercado..." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="amount">Valor (R$)</label>
+                            <input type="number" id="amount" step="0.01" placeholder="0,00" required min="0.01">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="type">Tipo</label>
+                            <select id="type" required>
+                                <option value="">Selecione o tipo</option>
+                                <option value="income">💰 Receita</option>
+                                <option value="expense">💸 Gasto</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="category">Categoria</label>
+                            <select id="category" required>
+                                <option value="">Selecione a categoria</option>
+                                <option value="salario">💼 Salário</option>
+                                <option value="freelance">💻 Freelance</option>
+                                <option value="investimento">📈 Investimentos</option>
+                                <option value="alimentacao">🍽️ Alimentação</option>
+                                <option value="transporte">🚗 Transporte</option>
+                                <option value="moradia">🏠 Moradia</option>
+                                <option value="saude">⚕️ Saúde</option>
+                                <option value="educacao">📚 Educação</option>
+                                <option value="lazer">🎬 Lazer</option>
+                                <option value="compras">🛍️ Compras</option>
+                                <option value="servicos">🔧 Serviços</option>
+                                <option value="outros">📝 Outros</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group form-group-full">
+                            <label for="notes">Observações (opcional)</label>
+                            <textarea id="notes" placeholder="Adicione detalhes sobre esta transação..." rows="2"></textarea>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn">
+                        <span id="btnText">Adicionar Transação</span>
+                    </button>
+                </form>
+            </div>
+
+            <div class="panel">
+                <h2>🎯 Metas & Ações</h2>
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <div class="form-group">
+                        <label for="goalInput">Meta de Economia Mensal (R$)</label>
+                        <input type="number" id="goalInput" placeholder="Ex: 1000" step="0.01" min="0">
+                    </div>
+                    <button class="btn btn-secondary" onclick="app.setGoal()">🎯 Definir Meta</button>
+                    <button class="btn" onclick="app.exportData()">📄 Exportar Dados</button>
+                    <button class="btn btn-danger" onclick="app.clearAllData()">🗑️ Limpar Tudo</button>
+                </div>
+                
+                <div class="info-box">
+                    <strong>Total de transações:</strong> <span id="totalCount">0</span><br>
+                    <strong>Última atualização:</strong> <span id="lastUpdate">Nunca</span><br>
+                    <strong>Período ativo:</strong> <span id="activePeriod">-</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="transactions">
+            <h2>
+                📋 Histórico de Transações
+                <span style="font-size: 0.9rem; font-weight: normal; color: #718096;" id="transactionCount">0 transações</span>
+            </h2>
+            
+            <div class="search-box">
+                <input type="text" class="search-input" id="searchInput" placeholder="🔍 Pesquisar transações...">
+            </div>
+
+            <div class="filters">
+                <label>Filtrar por:</label>
+                <select id="filterType">
+                    <option value="all">Todos os tipos</option>
+                    <option value="income">Apenas receitas</option>
+                    <option value="expense">Apenas gastos</option>
+                </select>
+                <select id="filterCategory">
+                    <option value="all">Todas as categorias</option>
+                    <option value="salario">Salário</option>
+                    <option value="freelance">Freelance</option>
+                    <option value="investimento">Investimentos</option>
+                    <option value="alimentacao">Alimentação</option>
+                    <option value="transporte">Transporte</option>
+                    <option value="moradia">Moradia</option>
+                    <option value="saude">Saúde</option>
+                    <option value="educacao">Educação</option>
+                    <option value="lazer">Lazer</option>
+                    <option value="compras">Compras</option>
+                    <option value="servicos">Serviços</option>
+                    <option value="outros">Outros</option>
+                </select>
+                <select id="filterPeriod">
+                    <option value="all">Todos os períodos</option>
+                    <option value="today">Hoje</option>
+                    <option value="week">Esta semana</option>
+                    <option value="month">Este mês</option>
+                    <option value="year">Este ano</option>
+                </select>
+                <button class="btn btn-small" onclick="app.clearFilters()">Limpar Filtros</button>
+            </div>
+            
+            <div id="transactionList" class="transaction-list">
+                <div class="empty">
+                    <div style="font-size: 3rem; margin-bottom: 15px;">📝</div>
+                    Nenhuma transação registrada ainda.<br>
+                    Adicione sua primeira transação acima!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
